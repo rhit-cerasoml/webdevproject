@@ -8,7 +8,7 @@ class Atlas {
     drawTexture(id, x, y, scale){
         scale = scale ? scale : 1;
         const currentX = (id * this.tSize) % this.width;
-        bufCtx.drawImage(this.src, currentX, (id * this.tSize - currentX), this.tSize, this.tSize, x, y, this.tSize * scale, this.tSize * scale);
+        bufCtx.drawImage(this.src, currentX, (id * this.tSize - currentX) / (this.width / this.tSize), this.tSize, this.tSize, x, y, this.tSize * scale, this.tSize * scale);
     }
 }
 
@@ -27,8 +27,8 @@ class Map {
         const ty = y/tSize;
         for(let xi = 0; xi < Math.floor(1920 / tSize) + 1; xi++){
             for(let yi = 0; yi < Math.floor(1920 / tSize) + 1; yi++){
-                if(inBounds(this.tiles, xi + Math.floor(tx)) && inBounds(this.tiles[0], yi + Math.floor(ty))){
-                    this.tileMap.drawTexture(this.tiles[xi + Math.floor(tx)][yi + Math.floor(ty)], xi * tSize - (x % tSize), yi * tSize - tSize - (y % tSize), zoom);
+                if(inBounds(this.tiles[0], xi + Math.floor(tx)) && inBounds(this.tiles, yi + Math.floor(ty))){
+                    this.tileMap.drawTexture(this.tiles[yi + Math.floor(ty)][xi + Math.floor(tx)], xi * tSize - ((x % tSize + tSize) % tSize), yi * tSize - ((y % tSize + tSize) % tSize), zoom);
                 }
             }
         }
@@ -72,24 +72,25 @@ canvas.width = X_RES;
 canvas.height = Y_RES;
 const bufCtx = bufCnv.getContext('2d');
 
-let vx = 50.0;
-let vy = 50.0;
+let vx = 0.0;
+let vy = 0.0;
 
 const tileAtlas = new Atlas(tileAtlasSrc, 64, 256);
+let character = null;
 
 let entities = {};
 const atlases = [
-    tileAtlas
+    tileAtlas,
+    new Atlas(document.querySelector("#stormhead"), 120, 120)
 ];
 
-const ws = new WebSocket('ws://137.112.136.58:6660');
+const ws = new WebSocket('ws://137.112.215.165:6660');
 
 function assignListener(socket){
     socket.onmessage = (msg) => {
         if(msg){
             //console.log(JSON.parse(msg.data));
             const packet = JSON.parse(msg.data);
-            console.log(packet);
             if(packet.R && packet.R.length != 0){
                 packet.R.forEach(parseMessage);
             }
@@ -102,14 +103,18 @@ function parseMessage(packet){
     if(packet.T === 'E'){
         if(packet.A === 'C'){
             entities[packet.D.id] = new Entity(packet.D);
+            if(!character && packet.D.character){
+                character = entities[packet.D.id];
+            }
         }else if(packet.A === 'U'){
-            console.log(entities);
             entities[packet.D.id].pos = packet.D.pos;
         }else if(packet.A === 'S'){
-            console.log(packet.D);
-            for(const [k, v] in Object.entries(packet.D)){
-                entities[k] = new Entity(packet.D[k]);
+            entities = {};
+            for(const o in packet.D){
+                entities[o] = new Entity(packet.D[o]);
             }
+        }else if(packet.A === 'D'){
+            delete entities[packet.D.id];
         }
     }
 }
@@ -124,16 +129,25 @@ function main(){
     
     ctx.imageSmoothingEnabled = false;
     bufCtx.imageSmoothingEnabled = false;
-    const maparr = [[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
-                    [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
+    /*const maparr = [[5, 5, 5, 5, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [5, 9, 9, 5, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [6, 16, 16, 4, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [6, 17, 17, 4, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
                     [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
                     [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3]];
+    */
+   const maparr = [[0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                    [8, 9, 10, 11],
+                    [12, 13, 14, 15],
+                    [16, 17, 18, 19]];
     map = new Map(tileAtlas, maparr);
     //entities.push(new Entity(tileAtlas, 0, 500, 500));
     console.log("start");
     window.requestAnimationFrame(drawLoop);
 
     ws.onopen = function() {
+        console.log(
+            "connected"
+        );
         ws.send(JSON.stringify({
             R: [{
                     T: "W",
@@ -142,7 +156,7 @@ function main(){
                 {
                     T: "E",
                     A: "C",
-                    D: {pos: {x: 50, y: 50}, atlasId: 0}
+                    D: {pos: {x: vx, y: vy}, atlasId: 1, character: true}
                 },
                 {
                     T: "E",
@@ -184,7 +198,7 @@ function drawLoop() {
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: 0, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: {x: vx, y: vy}}
         }]}));
     }
     if(keys.s && !keys.w){
@@ -192,7 +206,7 @@ function drawLoop() {
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: 0, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: {x: vx, y: vy}}
         }]}));
     }
     if(keys.a && !keys.d){
@@ -200,7 +214,7 @@ function drawLoop() {
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: 0, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: {x: vx, y: vy}}
         }]}));
     }
     if(keys.w && !keys.s){
@@ -208,7 +222,7 @@ function drawLoop() {
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: 0, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: {x: vx, y: vy}}
         }]}));
     }
 
@@ -218,7 +232,7 @@ function drawLoop() {
 
 // Clear the draw buffer 
 function clearBuffer() {
-    bufCtx.fillStyle = 'grey';
+    bufCtx.fillStyle = '#191714';
     bufCtx.fillRect(0, 0, X_RES, Y_RES);
 }
 

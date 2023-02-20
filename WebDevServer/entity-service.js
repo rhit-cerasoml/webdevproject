@@ -12,7 +12,7 @@ class EntitySet {
         this.IDGen++;
         return this.IDGen - 1;
     }
-    request(socket, request){
+    request(socket, request, sender){
         if(request.A === 'S'){
             console.log("syncing entities");
             socket.send(JSON.stringify({R: [{
@@ -27,8 +27,18 @@ class EntitySet {
             const newID = this.requestID();
             this.Entities[newID] = request.D;
             request.D['id'] = newID;
+            sender.ownedEntities.push(newID);
             this.parent.distribute(request);
         }
+    }
+
+    remove(id){
+        delete this.Entities[id];
+        this.parent.distribute({
+            T: 'E',
+            A: 'D',
+            D: {id: id}
+        });
     }
 }
 

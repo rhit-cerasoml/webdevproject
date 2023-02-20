@@ -21,14 +21,18 @@ class World{
         this.sockets.push(socket);
     }
 
-    entityRequest(socket, request){
-        this.entitySet.request(socket, request);
+    entityRequest(socket, request, sender){
+        this.entitySet.request(socket, request, sender);
     }
 
     distribute(packet){
         this.sockets.forEach((s) => {
             s.queueRequest(packet);
         });
+    }
+
+    removeEntity(id){
+        this.entitySet.remove(id);
     }
 }
 

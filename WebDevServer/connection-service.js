@@ -5,12 +5,16 @@ class SocketListener{
     constructor(socket){
         this.socket = socket;
         this.queue = [];
+        this.ownedEntities = [];
         socket.on('message', (msg) => {
             const reqs = JSON.parse(msg);
             this.parseRequests(reqs, msg.origin);
         });
         socket.on('close', () => {
             socket = socketListeners.filter(s => s == this);
+            this.ownedEntities.forEach((e) => {
+                this.world.removeEntity(e);
+            });
         })
         this.world;
     }
@@ -28,7 +32,7 @@ class SocketListener{
             this.world = world.get(req.W);
         }
         if(req.T === 'E'){
-            this.world.entityRequest(this.socket, req);
+            this.world.entityRequest(this.socket, req, this);
         }
     }
 
