@@ -1,0 +1,25 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    max-height: 100vh;
+}
+
+#gameview {
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    width: 100%;
+    image-rendering: pixelated;
+}
+
+#gameContainer {
+    aspect-ratio: 1920 / 1080;
+    position: absolute;
+    max-height: 100vh;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
