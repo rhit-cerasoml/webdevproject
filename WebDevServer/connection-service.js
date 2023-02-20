@@ -41,6 +41,9 @@ class SocketListener{
     }
 
     packetResponses(){
+        if(this.world){
+            this.world.queueEntityUpdates();
+        }
         if(this.queue.length != 0){
             this.socket.send(JSON.stringify({
                 R: this.queue

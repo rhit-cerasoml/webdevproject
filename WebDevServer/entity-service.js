@@ -4,6 +4,7 @@ class EntitySet {
     constructor(parent){
         this.parent = parent;
         this.Entities = {};
+        this.updateQueue = {};
         this.IDGen = 0;
         //this.Entities.push(new Entity(this.requestID(), new util.vec2(100, 100), {}));
         //this.Entities.push(new Entity(this.requestID(), new util.vec2(100, 100), {}));
@@ -22,7 +23,7 @@ class EntitySet {
             }]}));
         }else if(request.A === 'U'){
             this.Entities[request.D.id].pos = request.D.pos;
-            this.parent.distribute(request);
+            this.updateQueue[request.D.id] = request;
         }else if(request.A === 'C'){
             const newID = this.requestID();
             this.Entities[newID] = request.D;

@@ -34,6 +34,13 @@ class World{
     removeEntity(id){
         this.entitySet.remove(id);
     }
+
+    queueEntityUpdates(){
+        for(const o in this.entitySet.updateQueue){
+            this.distribute(this.entitySet.updateQueue[o]);
+            delete this.entitySet.updateQueue[o];
+        }
+    }
 }
 
 module.exports = {

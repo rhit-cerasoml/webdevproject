@@ -44,7 +44,7 @@ class Entity {
     }
 
     drawEntity(xOffset, yOffset){
-        this.atlas.drawTexture(this.frame, this.pos.x - xOffset, this.pos.y - yOffset)
+        this.atlas.drawTexture(this.frame, this.pos.x - xOffset, this.pos.y - yOffset);
     }
 }
 
@@ -156,7 +156,7 @@ function main(){
                 {
                     T: "E",
                     A: "C",
-                    D: {pos: {x: vx, y: vy}, atlasId: 1, character: true}
+                    D: {pos: {x: vx, y: vy}, atlasId: 0, character: true}
                 },
                 {
                     T: "E",
@@ -185,7 +185,11 @@ function drawLoop() {
     // draw
     // tileAtlas.drawTexture(0, 0, 0);
     // tileAtlas.drawTexture(0, 64, 64, 2);
-    map.drawMap(vx, vy, 2);
+    if(character){
+        vx = character.pos.x - X_RES / 2;
+        vy = character.pos.y - Y_RES / 2;
+        map.drawMap(vx, vy, 2);
+    }
 
     for(const [key, value] of Object.entries(entities)){
         value.drawEntity(vx, vy);
@@ -194,35 +198,35 @@ function drawLoop() {
     //x++;
     //entities[0].y++;
     if(keys.d && !keys.a){
-        vx++;
+        character.pos.x++;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: character.id, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: character.pos}
         }]}));
     }
     if(keys.s && !keys.w){
-        vy++;
+        character.pos.y++;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: character.id, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: character.pos}
         }]}));
     }
     if(keys.a && !keys.d){
-        vx--;
+        character.pos.x--;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: character.id, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: character.pos}
         }]}));
     }
     if(keys.w && !keys.s){
-        vy--;
+        character.pos.y--;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
-            D: {id: character.id, pos: {x: vx, y: vy}}
+            D: {id: character.id, pos: character.pos}
         }]}));
     }
 
