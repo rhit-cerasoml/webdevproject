@@ -41,6 +41,7 @@ class Entity {
         this.pos = data.pos;
         this.frame = 0;
         this.scale = data.scale ? data.scale : 1;
+        this.animationState = data.state;
         this.atlas = atlases[data.atlasId];
     }
 
@@ -100,9 +101,7 @@ function assignListener(socket){
 
 function parseMessage(packet){
     //console.log(packet);
-    if(packet.T === 'L'){
-        
-    } if(packet.T === 'I') {
+    if(packet.T === 'I') {
         
     } if(packet.T === 'E'){
         if(packet.A === 'C'){
@@ -151,7 +150,7 @@ function initGame(){
             {
                 T: "E",
                 A: "C",
-                D: {pos: {x: vx, y: vy}, atlasId: 1, character: true, scale: 4.0}
+                D: {pos: {x: vx, y: vy}, atlasId: 1, character: true, scale: 4.0, state: 0}
             },
             {
                 T: "E",
@@ -162,7 +161,12 @@ function initGame(){
                 T: "M",
                 A: "S",
                 D: {}
-            }
+            },
+            {
+                T: "I",
+                A: "S",
+                D: {}
+            },
         ]
     }));
     initInventory();

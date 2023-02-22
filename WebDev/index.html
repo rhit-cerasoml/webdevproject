@@ -8,6 +8,12 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
     <body>
+        <div id="gameContainer">
+            <canvas id="gameview"></canvas>
+
+            
+        </div>
+
         <div class="modal fade overlay" id="loginDropModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div id="loginModal" class="modal-dialog modal-fullscreen-sm-down">
                 <div class="modal-content">
@@ -27,11 +33,29 @@
                 </div>
             </div>
         </div>
-
-        <div id="gameContainer">
-            <canvas id="gameview"></canvas>
+        <div class="modal fade overlay" id="loginDropModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div id="loginModal2" class="modal-dialog modal-fullscreen-sm-down">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="loginInputUsername2" class="form-label">Username</label>
+                            <input type="email" class="form-control" id="loginInputUsername2" aria-describedby="emailHelp2">
+                            <div id="emailHelp2" class="form-text">If not recognized we will create a new user for you.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginInputPassword2" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginInputPassword2" aria-describedby="passwordHelp2">
+                            <div id="passwordHelp2" class="form-text">DOES IT WORK</div>
+                        </div>
+                        <button type="submit" id="loginButton2" class="btn btn-primary">Log in</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        
+        <script src="js/jquery.min.js"></script>
+        <script src="js/popper.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
         <script type="text/javascript" src="js/login.js"></script>

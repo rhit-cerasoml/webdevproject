@@ -22,12 +22,13 @@ document.getElementById('loginButton').onclick = () => {
     ws.send(JSON.stringify({user: username, pass: password}));
     const loginListener = (res) => {
         const result = JSON.parse(res.data);
-        console.log(result);
         if(result.success){
             console.log("Logged in as " + result.user);
             loginModal.hide();
-            ws.removeEventListener('message', loginListener);
-            initGame();
+            setTimeout(() => {
+                ws.removeEventListener('message', loginListener);
+                initGame();
+            }, 500);
         }else{
             alert("invalid login");
         }
