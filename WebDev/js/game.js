@@ -111,7 +111,9 @@ function parseMessage(packet){
                 character = entities[packet.D.id];
             }
         }else if(packet.A === 'U'){
-            entities[packet.D.id].pos = packet.D.pos;
+            if(!(packet.D.id === character.id) || packet.D.force){
+                entities[packet.D.id].pos = packet.D.pos;
+            }
         }else if(packet.A === 'S'){
             entities = {};
             for(const o in packet.D){
@@ -181,6 +183,13 @@ function keyDown(e) {
 function keyUp(e) {
     if(keys[e.key] != null){
         keys[e.key] = false;
+        if(e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd'){
+            ws.send(JSON.stringify({R: [{
+                T: 'E',
+                A: 'U',
+                D: {id: character.id, pos: character.pos, force: true}
+            }]}));
+        }
     }
 }
 
