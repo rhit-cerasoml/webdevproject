@@ -17,9 +17,3 @@ server.on('connection', (socket) => {
 world.make({});
 
 setInterval(connectionService.updateTick, 20);
-
-
-
-
-
-

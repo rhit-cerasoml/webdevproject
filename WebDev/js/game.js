@@ -40,11 +40,12 @@ class Entity {
         this.id = data.id;
         this.pos = data.pos;
         this.frame = 0;
+        this.scale = data.scale ? data.scale : 1;
         this.atlas = atlases[data.atlasId];
     }
 
     drawEntity(xOffset, yOffset){
-        this.atlas.drawTexture(this.frame, this.pos.x - xOffset, this.pos.y - yOffset);
+        this.atlas.drawTexture(this.frame, this.pos.x - xOffset, this.pos.y - yOffset, this.scale);
     }
 }
 
@@ -81,10 +82,9 @@ let character = null;
 let entities = {};
 const atlases = [
     tileAtlas,
-    new Atlas(document.querySelector("#stormhead"), 120, 120)
+    new Atlas(document.querySelector("#stormhead"), 120, 1200)
 ];
 
-const ws = new WebSocket('ws://137.112.215.165:6660');
 
 function assignListener(socket){
     socket.onmessage = (msg) => {
@@ -99,8 +99,12 @@ function assignListener(socket){
 }
 
 function parseMessage(packet){
-    console.log(packet);
-    if(packet.T === 'E'){
+    //console.log(packet);
+    if(packet.T === 'L'){
+        
+    } if(packet.T === 'I') {
+        
+    } if(packet.T === 'E'){
         if(packet.A === 'C'){
             entities[packet.D.id] = new Entity(packet.D);
             if(!character && packet.D.character){
@@ -121,12 +125,9 @@ function parseMessage(packet){
 
 
 // Start program
-main();
 
 // Initialization
-function main(){
-    //setInterval(drawLoop, 1000 / FRAME_RATE);
-    
+function initGame(){
     ctx.imageSmoothingEnabled = false;
     bufCtx.imageSmoothingEnabled = false;
     /*const maparr = [[5, 5, 5, 5, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], [5, 9, 9, 5, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1], [6, 16, 16, 4, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2], [6, 17, 17, 4, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -140,41 +141,47 @@ function main(){
                     [12, 13, 14, 15],
                     [16, 17, 18, 19]];
     map = new Map(tileAtlas, maparr);
-    //entities.push(new Entity(tileAtlas, 0, 500, 500));
-    console.log("start");
-    window.requestAnimationFrame(drawLoop);
-
-    ws.onopen = function() {
-        console.log(
-            "connected"
-        );
-        ws.send(JSON.stringify({
-            R: [{
-                    T: "W",
-                    W: 0
-                },
-                {
-                    T: "E",
-                    A: "C",
-                    D: {pos: {x: vx, y: vy}, atlasId: 0, character: true}
-                },
-                {
-                    T: "E",
-                    A: "S",
-                    D: {}
-                },
-                {
-                    T: "M",
-                    A: "S",
-                    D: {}
-                }
-            ]
-        }));
-    };
-
+    ws.send(JSON.stringify({
+        R: [{
+                T: "W",
+                W: 0
+            },
+            {
+                T: "E",
+                A: "C",
+                D: {pos: {x: vx, y: vy}, atlasId: 1, character: true, scale: 4.0}
+            },
+            {
+                T: "E",
+                A: "S",
+                D: {}
+            },
+            {
+                T: "M",
+                A: "S",
+                D: {}
+            }
+        ]
+    }));
+    initInventory();
     assignListener(ws);
+    window.requestAnimationFrame(drawLoop);
+    window.addEventListener('keydown', keyDown, true);
+    window.addEventListener('keyup', keyUp, true);
+}
 
 
+function keyDown(e) {
+    if(keys[e.key] != null){
+        keys[e.key] = true;
+    }
+}
+
+
+function keyUp(e) {
+    if(keys[e.key] != null){
+        keys[e.key] = false;
+    }
 }
 
 // draw loop
@@ -198,7 +205,7 @@ function drawLoop() {
     //x++;
     //entities[0].y++;
     if(keys.d && !keys.a){
-        character.pos.x++;
+        character.pos.x+=5;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
@@ -206,7 +213,7 @@ function drawLoop() {
         }]}));
     }
     if(keys.s && !keys.w){
-        character.pos.y++;
+        character.pos.y+=5;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
@@ -214,7 +221,7 @@ function drawLoop() {
         }]}));
     }
     if(keys.a && !keys.d){
-        character.pos.x--;
+        character.pos.x-=5;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
@@ -222,7 +229,7 @@ function drawLoop() {
         }]}));
     }
     if(keys.w && !keys.s){
-        character.pos.y--;
+        character.pos.y-=5;
         ws.send(JSON.stringify({R: [{
             T: 'E',
             A: 'U',
@@ -254,20 +261,6 @@ const keys = {
     s: false,
     d: false};
 
-window.addEventListener('keydown', keyDown, true);
-function keyDown(e) {
-    console.log("down: " + e.key);
-    if(keys[e.key] != null){
-        keys[e.key] = true;
-    }
-}
 
-window.addEventListener('keyup', keyUp, true);
-function keyUp(e) {
-    console.log("up: " + e.key);
-    if(keys[e.key] != null){
-        keys[e.key] = false;
-    }
-}
 
 

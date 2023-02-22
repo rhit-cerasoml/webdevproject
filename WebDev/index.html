@@ -1,15 +1,41 @@
 <html>
     <div style="display:none;">
         <img id="atlas" src="lily_tileset.png" width="256" height="256">
-        <img id="stormhead" src="stormhead/" width="120" height="1240">
+        <img id="stormhead" src="stormhead/run.png" width="1200" height="120">
     </div>
     <head>
         <link rel="stylesheet" href="style.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
     <body>
+        <div class="modal fade overlay" id="loginDropModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div id="loginModal" class="modal-dialog modal-fullscreen-sm-down">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="loginInputUsername" class="form-label">Username</label>
+                            <input type="email" class="form-control" id="loginInputUsername" aria-describedby="emailHelp">
+                            <div id="emailHelp" class="form-text">If not recognized we will create a new user for you.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginInputPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginInputPassword" aria-describedby="passwordHelp">
+                            <div id="passwordHelp" class="form-text">Passwords are not securely stored or transmitted, don't use your normal password</div>
+                        </div>
+                        <button type="submit" id="loginButton" class="btn btn-primary">Log in</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="gameContainer">
             <canvas id="gameview"></canvas>
         </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+        <script type="text/javascript" src="js/login.js"></script>
         <script type="text/javascript" src="js/game.js"></script>
+        <script type="text/javascript" src="js/inventory.js"></script>
     </body>
 </html>

@@ -1,4 +1,5 @@
 const world = require('./world');
+const login = require('./user-service');
 
 const socketListeners = [];
 class SocketListener{
@@ -6,12 +7,10 @@ class SocketListener{
         this.socket = socket;
         this.queue = [];
         this.ownedEntities = [];
-        socket.on('message', (msg) => {
-            const reqs = JSON.parse(msg);
-            this.parseRequests(reqs, msg.origin);
-        });
+        this.loginListener = this.awaitLogin.bind(this);
+        socket.on('message', this.loginListener);
         socket.on('close', () => {
-            socket = socketListeners.filter(s => s == this);
+            this.socketListeners = socketListeners.filter(s => s != this);
             this.ownedEntities.forEach((e) => {
                 this.world.removeEntity(e);
             });
@@ -19,10 +18,36 @@ class SocketListener{
         this.world;
     }
 
+    awaitLogin(msg){
+        const req = JSON.parse(msg);
+        const user = login.login(req);
+        if(user) {
+            this.user = user;
+            this.socket.removeEventListener('message', this.loginListener);
+            delete this.loginListener;
+            this.socket.on('message', (msg) => {
+                const reqs = JSON.parse(msg);
+                this.parseRequests(reqs);
+            });
+            this.socket.removeEventListener('message', this.loginListener);
+            delete this.loginListener;
+            this.socket.send(JSON.stringify({
+                user: this.user,
+                success: true
+            }));
+        }else{
+            this.socket.send(JSON.stringify({
+                success: false
+            }));
+        }
+    }
+
     parseRequests(reqs) {
-        reqs.R.forEach(req => {
-            this.parseRequest(req);
-        });
+        if(reqs.R){
+            reqs.R.forEach(req => {
+                this.parseRequest(req);
+            });
+        }
     }
     
     parseRequest(req){
