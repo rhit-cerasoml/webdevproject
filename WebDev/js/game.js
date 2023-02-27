@@ -180,6 +180,8 @@ function initGame(){
 function keyDown(e) {
     if(keys[e.key] != null){
         keys[e.key] = true;
+    }else if(e.key === 'i'){
+        toggleInventory();
     }
 }
 
@@ -187,7 +189,7 @@ function keyDown(e) {
 function keyUp(e) {
     if(keys[e.key] != null){
         keys[e.key] = false;
-        if(e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd'){
+        if(!inventoryOpen && (e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd')){
             ws.send(JSON.stringify({R: [{
                 T: 'E',
                 A: 'U',
@@ -217,6 +219,16 @@ function drawLoop() {
 
     //x++;
     //entities[0].y++;
+    
+    if(!inventoryOpen){
+        processInput();
+    }
+
+    swapBuffer();
+    window.requestAnimationFrame(drawLoop);
+}
+
+function processInput(){
     if(keys.d && !keys.a){
         character.pos.x+=5;
         ws.send(JSON.stringify({R: [{
@@ -249,9 +261,6 @@ function drawLoop() {
             D: {id: character.id, pos: character.pos}
         }]}));
     }
-
-    swapBuffer();
-    window.requestAnimationFrame(drawLoop);
 }
 
 // Clear the draw buffer 

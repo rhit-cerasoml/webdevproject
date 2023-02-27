@@ -1,4 +1,4 @@
-var ws = new WebSocket('ws://137.112.215.165:6660');
+var ws = new WebSocket('ws://127.0.0.1:6660');
 
 var loginModal = new bootstrap.Modal(document.getElementById('loginDropModal'), {
     keyboard: false,
